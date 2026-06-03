@@ -16,6 +16,7 @@ create table bars (
 -- Partidos del Mundial 2026
 create table matches (
   id uuid primary key default gen_random_uuid(),
+  external_id text unique not null,  -- clave estable para upserts del sync diario
   home_team text not null,
   away_team text not null,
   match_date timestamptz not null,
