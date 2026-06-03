@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 import Link from 'next/link'
 import Badge from '@/components/ui/Badge'
 import BarMatchesSection from '@/components/dashboard/BarMatchesSection'
+import { Globe, Calendar, Trophy, Eye, Star, Building2, Camera, MapPin, Phone } from 'lucide-react'
 
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient()
@@ -27,7 +28,7 @@ export default async function DashboardPage() {
       <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 font-bold text-xl text-gray-900 hover:text-green-700 transition-colors">
-            <span>⚽</span>
+            <Globe className="w-6 h-6 text-green-700" />
             <span>MundiApp</span>
           </Link>
           <div className="flex items-center gap-4">
@@ -55,13 +56,13 @@ export default async function DashboardPage() {
         {/* Stats row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
           {[
-            { label: 'Partidos', value: selectedMatchIds.length.toString(), icon: '⚽' },
-            { label: 'Grupos', value: '—', icon: '🏆' },
-            { label: 'Visitas', value: '—', icon: '👁️' },
-            { label: 'Valoración', value: '—', icon: '⭐' },
+            { label: 'Partidos', value: selectedMatchIds.length.toString(), icon: <Calendar className="w-5 h-5 text-green-600" /> },
+            { label: 'Fases', value: '—', icon: <Trophy className="w-5 h-5 text-amber-500" /> },
+            { label: 'Visitas', value: '—', icon: <Eye className="w-5 h-5 text-blue-500" /> },
+            { label: 'Valoración', value: '—', icon: <Star className="w-5 h-5 text-yellow-500" /> },
           ].map((stat) => (
             <div key={stat.label} className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col gap-1 shadow-sm">
-              <span className="text-xl">{stat.icon}</span>
+              {stat.icon}
               <span className="text-xl font-bold text-gray-900">{stat.value}</span>
               <span className="text-xs text-gray-500">{stat.label}</span>
             </div>
@@ -73,7 +74,7 @@ export default async function DashboardPage() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-                <span>🏪</span> Perfil del bar
+                <Building2 className="w-4 h-4 text-gray-500" /> Perfil del bar
               </h2>
               <Badge variant={bar?.description && bar?.address ? 'green' : 'amber'}>
                 {bar?.description && bar?.address ? 'Completo' : 'Pendiente'}
@@ -115,7 +116,7 @@ export default async function DashboardPage() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden sm:col-span-2">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-                <span>📸</span> Fotos del local
+                <Camera className="w-4 h-4 text-gray-500" /> Fotos del local
               </h2>
               <Badge variant="gray">{(bar?.photos ?? []).length} fotos</Badge>
             </div>
@@ -126,7 +127,7 @@ export default async function DashboardPage() {
                     key={i}
                     className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-300 hover:border-green-400 hover:text-green-400 cursor-pointer transition-colors"
                   >
-                    <span className="text-xl">+</span>
+                    <Camera className="w-5 h-5" />
                   </div>
                 ))}
               </div>

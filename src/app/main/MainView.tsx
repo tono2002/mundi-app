@@ -3,7 +3,9 @@
 import { useState, useEffect, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { getFlag } from '@/lib/flags'
+import { getFlagCode } from '@/lib/flags'
+import { Search, X, Settings, Building2, User, MapPin, Phone, Star, Navigation, Map } from 'lucide-react'
+import Flag from '@/components/ui/Flag'
 import type { Match } from '@/types'
 import type { MapBar } from '@/components/map/MapComponent'
 
@@ -96,7 +98,7 @@ export default function MainView({ matches, bars }: { matches: Match[]; bars: Ba
           className="shrink-0 flex items-center justify-center w-9 h-9 rounded-xl hover:bg-green-50 transition-colors"
           title="Inicio"
         >
-          <span className="text-xl">⚽</span>
+          <svg viewBox="0 0 24 24" className="w-6 h-6 text-green-700" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
         </Link>
 
         <div className="w-px h-5 bg-gray-200 shrink-0" />
@@ -113,9 +115,9 @@ export default function MainView({ matches, bars }: { matches: Match[]; bars: Ba
             />
             <button
               onClick={() => { setShowSearch(false); setSearch('') }}
-              className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 text-xl leading-none rounded-lg hover:bg-gray-100"
+              className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
             >
-              ×
+              <X className="w-4 h-4" />
             </button>
           </div>
         ) : (
@@ -123,9 +125,7 @@ export default function MainView({ matches, bars }: { matches: Match[]; bars: Ba
             onClick={() => setShowSearch(true)}
             className="shrink-0 flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-xl transition-colors"
           >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
-            </svg>
+            <Search className="w-3.5 h-3.5" />
             <span className="hidden sm:block">Buscar</span>
           </button>
         )}
@@ -159,12 +159,12 @@ export default function MainView({ matches, bars }: { matches: Match[]; bars: Ba
                     : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300',
                 ].join(' ')}
               >
-                {isFav && !isSelected && <span>⭐</span>}
-                <span className="text-base">{getFlag(match.home_team)}</span>
+                {isFav && !isSelected && <Star className="w-3 h-3 fill-amber-400 text-amber-400 shrink-0" />}
+                <Flag code={getFlagCode(match.home_team)} className="w-5 h-3.5 rounded-[2px] shrink-0" />
                 <span className="font-bold">{homeAbbr}</span>
                 <span className={isSelected ? 'text-green-200' : 'text-gray-300'}>vs</span>
                 <span className="font-bold">{awayAbbr}</span>
-                <span className="text-base">{getFlag(match.away_team)}</span>
+                <Flag code={getFlagCode(match.away_team)} className="w-5 h-3.5 rounded-[2px] shrink-0" />
                 <span className={`hidden sm:block ${isSelected ? 'text-green-100' : 'text-gray-400'}`}>{time}</span>
                 {barCount > 0 && (
                   <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700'}`}>
@@ -196,7 +196,7 @@ export default function MainView({ matches, bars }: { matches: Match[]; bars: Ba
         {!selectedMatch && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
             <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-4 text-center shadow-sm">
-              <p className="text-3xl mb-2">🗺️</p>
+              <Map className="w-8 h-8 text-green-600 mx-auto mb-2" />
               <p className="text-sm font-semibold text-gray-700">Selecciona un partido</p>
               <p className="text-xs text-gray-400 mt-0.5">para ver los bares que lo emiten</p>
             </div>
@@ -207,7 +207,7 @@ export default function MainView({ matches, bars }: { matches: Match[]; bars: Ba
         {selectedMatch && (
           <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
             <div className="bg-white rounded-2xl shadow-lg px-4 py-2 flex items-center gap-3 pointer-events-auto">
-              <span className="text-xl">{getFlag(selectedMatch.home_team)}</span>
+              <Flag code={getFlagCode(selectedMatch.home_team)} className="w-7 h-5 rounded-sm shrink-0" />
               <div className="text-center">
                 <p className="font-bold text-sm text-gray-900 leading-tight">
                   {selectedMatch.home_team} vs {selectedMatch.away_team}
@@ -216,12 +216,12 @@ export default function MainView({ matches, bars }: { matches: Match[]; bars: Ba
                   {formatDate(selectedMatch.match_date).date} · {formatDate(selectedMatch.match_date).time} · {visibleBars.length} bares
                 </p>
               </div>
-              <span className="text-xl">{getFlag(selectedMatch.away_team)}</span>
+              <Flag code={getFlagCode(selectedMatch.away_team)} className="w-7 h-5 rounded-sm shrink-0" />
               <button
                 onClick={() => { setSelectedMatch(null); setSelectedBar(null) }}
-                className="text-gray-300 hover:text-gray-500 text-lg leading-none ml-1"
+                className="text-gray-300 hover:text-gray-500 ml-1"
               >
-                ×
+                <X className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -230,20 +230,17 @@ export default function MainView({ matches, bars }: { matches: Match[]; bars: Ba
         {/* ── LEFT SIDEBAR ── */}
         <div className="absolute left-0 top-0 bottom-0 z-10 w-[60px] bg-white shadow-md flex flex-col items-center pt-3 pb-4 gap-1">
           <Link href="/login" title="Iniciar sesión como Bar" className="group flex flex-col items-center gap-0.5 w-11 py-2.5 rounded-xl hover:bg-green-50 transition-colors">
-            <span className="text-2xl">🏪</span>
+            <Building2 className="w-5 h-5 text-gray-400 group-hover:text-green-700" />
             <span className="text-[9px] font-medium text-gray-400 group-hover:text-green-700 leading-tight text-center">Bar</span>
           </Link>
-          <Link href="/login?type=fan" title="Iniciar sesión como Espectador" className="group flex flex-col items-center gap-0.5 w-11 py-2.5 rounded-xl hover:bg-blue-50 transition-colors">
-            <span className="text-2xl">👤</span>
+          <Link href="/login?type=fan" title="Iniciar sesión como Fan" className="group flex flex-col items-center gap-0.5 w-11 py-2.5 rounded-xl hover:bg-blue-50 transition-colors">
+            <User className="w-5 h-5 text-gray-400 group-hover:text-blue-600" />
             <span className="text-[9px] font-medium text-gray-400 group-hover:text-blue-600 leading-tight text-center">Fan</span>
           </Link>
           <div className="flex-1" />
-          <Link href="/" title="Inicio" className="group flex flex-col items-center gap-0.5 w-11 py-2.5 rounded-xl hover:bg-gray-100 transition-colors">
-            <svg className="w-5 h-5 text-gray-400 group-hover:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 9.75L12 3l9 6.75V21a.75.75 0 01-.75.75H3.75A.75.75 0 013 21V9.75z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 21V12h6v9" />
-            </svg>
-            <span className="text-[9px] font-medium text-gray-400 group-hover:text-gray-700">Inicio</span>
+          <Link href="/" title="Ajustes" className="group flex flex-col items-center gap-0.5 w-11 py-2.5 rounded-xl hover:bg-gray-100 transition-colors">
+            <Settings className="w-5 h-5 text-gray-400 group-hover:text-gray-700" />
+            <span className="text-[9px] font-medium text-gray-400 group-hover:text-gray-700">Ajustes</span>
           </Link>
         </div>
 
@@ -258,7 +255,7 @@ export default function MainView({ matches, bars }: { matches: Match[]; bars: Ba
                 <h3 className="font-bold text-gray-900 text-sm leading-tight">{selectedBar.name}</h3>
                 <p className="text-[11px] text-gray-400 mt-0.5">{selectedBar.address}</p>
               </div>
-              <button onClick={() => setSelectedBar(null)} className="text-gray-300 hover:text-gray-500 text-xl leading-none ml-2 shrink-0">×</button>
+              <button onClick={() => setSelectedBar(null)} className="text-gray-300 hover:text-gray-500 ml-2 shrink-0"><X className="w-4 h-4" /></button>
             </div>
             <div className="p-4 flex flex-col gap-2.5">
               {selectedBar.phone && (
@@ -272,8 +269,8 @@ export default function MainView({ matches, bars }: { matches: Match[]; bars: Ba
               {selectedBar.description && (
                 <p className="text-xs text-gray-500 leading-relaxed">{selectedBar.description}</p>
               )}
-              <button className="w-full py-2 bg-green-700 text-white text-xs font-bold rounded-xl hover:bg-green-800 transition-colors">
-                Cómo llegar →
+              <button className="w-full py-2 bg-green-700 text-white text-xs font-bold rounded-xl hover:bg-green-800 transition-colors flex items-center justify-center gap-1.5">
+                <Navigation className="w-3.5 h-3.5" /> Cómo llegar
               </button>
             </div>
           </div>
