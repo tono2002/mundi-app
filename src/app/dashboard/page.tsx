@@ -3,7 +3,8 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 import Link from 'next/link'
 import Badge from '@/components/ui/Badge'
 import BarMatchesSection from '@/components/dashboard/BarMatchesSection'
-import { Globe, Calendar, Trophy, Eye, Star, Building2, Camera, MapPin, Phone } from 'lucide-react'
+import BarPhotosSection from '@/components/dashboard/BarPhotosSection'
+import { Globe, Calendar, Trophy, Eye, Star, Building2, Camera } from 'lucide-react'
 
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient()
@@ -24,7 +25,6 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
       <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 font-bold text-xl text-gray-900 hover:text-green-700 transition-colors">
@@ -34,10 +34,7 @@ export default async function DashboardPage() {
           <div className="flex items-center gap-4">
             <span className="hidden sm:block text-sm text-gray-500">{user.email}</span>
             <form action="/api/auth/signout" method="POST">
-              <button
-                type="submit"
-                className="text-sm text-gray-500 hover:text-red-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50"
-              >
+              <button type="submit" className="text-sm text-gray-500 hover:text-red-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50">
                 Cerrar sesión
               </button>
             </form>
@@ -47,13 +44,10 @@ export default async function DashboardPage() {
 
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Panel de {bar?.name ?? 'tu bar'}
-          </h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Panel de {bar?.name ?? 'tu bar'}</h1>
           <p className="text-gray-500 text-sm mt-1">Gestiona tu perfil y los partidos que vas a emitir</p>
         </div>
 
-        {/* Stats row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
           {[
             { label: 'Partidos', value: selectedMatchIds.length.toString(), icon: <Calendar className="w-5 h-5 text-green-600" /> },
@@ -103,7 +97,6 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          {/* Partidos — componente cliente con modal */}
           {bar && (
             <BarMatchesSection
               barId={bar.id}
@@ -112,27 +105,12 @@ export default async function DashboardPage() {
             />
           )}
 
-          {/* Fotos */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden sm:col-span-2">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-                <Camera className="w-4 h-4 text-gray-500" /> Fotos del local
-              </h2>
-              <Badge variant="gray">{(bar?.photos ?? []).length} fotos</Badge>
-            </div>
-            <div className="p-6">
-              <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-300 hover:border-green-400 hover:text-green-400 cursor-pointer transition-colors"
-                  >
-                    <Camera className="w-5 h-5" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          {bar && (
+            <BarPhotosSection
+              barId={bar.id}
+              initialPhotos={bar.photos ?? []}
+            />
+          )}
         </div>
       </main>
     </div>
