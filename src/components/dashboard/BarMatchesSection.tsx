@@ -105,16 +105,35 @@ export default function BarMatchesSection({ barId, allMatches, initialSelectedId
     setSaving(true)
     const supabase = createClient()
 
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) {
+      setSaving(false)
+      alert('Tu sesión ha expirado. Por favor recarga la página e inicia sesión de nuevo.')
+      return
+    }
+
     const toAdd = [...selectedIds].filter((id) => !initialSelectedIds.includes(id))
     const toRemove = initialSelectedIds.filter((id) => !selectedIds.has(id))
 
     if (toAdd.length > 0) {
-      await supabase.from('bar_matches').insert(
+      const { error } = await supabase.from('bar_matches').insert(
         toAdd.map((match_id) => ({ bar_id: barId, match_id }))
       )
+      if (error) {
+        console.error('Error insertando bar_matches:', error)
+        setSaving(false)
+        alert(`Error al guardar partidos: ${error.message}`)
+        return
+      }
     }
     if (toRemove.length > 0) {
-      await supabase.from('bar_matches').delete().eq('bar_id', barId).in('match_id', toRemove)
+      const { error } = await supabase.from('bar_matches').delete().eq('bar_id', barId).in('match_id', toRemove)
+      if (error) {
+        console.error('Error eliminando bar_matches:', error)
+        setSaving(false)
+        alert(`Error al eliminar partidos: ${error.message}`)
+        return
+      }
     }
 
     setSaving(false)
