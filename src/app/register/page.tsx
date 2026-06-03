@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import AddressAutocomplete from '@/components/ui/AddressAutocomplete'
 
 type Step = 1 | 2
 
@@ -18,6 +19,8 @@ interface AccountData {
 interface ProfileData {
   description: string
   address: string
+  lat: number | null
+  lng: number | null
   phone: string
   website: string
 }
@@ -63,6 +66,8 @@ export default function RegisterPage() {
   const [profile, setProfile] = useState<ProfileData>({
     description: '',
     address: '',
+    lat: null,
+    lng: null,
     phone: '',
     website: '',
   })
@@ -112,33 +117,14 @@ export default function RegisterPage() {
     setError('')
     setLoading(true)
 
-    let lat: number | null = null
-    let lng: number | null = null
-
-    if (profile.address.trim()) {
-      try {
-        const geo = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(profile.address)}&format=json&limit=1`,
-          { headers: { 'Accept-Language': 'es' } }
-        )
-        const results = await geo.json()
-        if (results.length > 0) {
-          lat = parseFloat(results[0].lat)
-          lng = parseFloat(results[0].lon)
-        }
-      } catch {
-        // geocoding falla silenciosamente — editable desde el dashboard
-      }
-    }
-
     const supabase = createClient()
     const { error: updateError } = await supabase
       .from('bars')
       .update({
         description: profile.description || null,
         address: profile.address || null,
-        lat,
-        lng,
+        lat: profile.lat,
+        lng: profile.lng,
         phone: profile.phone || null,
         website: profile.website || null,
       })
@@ -261,14 +247,17 @@ export default function RegisterPage() {
                 />
               </div>
               <div>
-                <Input
-                  label="Dirección"
-                  type="text"
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Dirección <span className="text-gray-400 font-normal">(opcional)</span>
+                </label>
+                <AddressAutocomplete
                   value={profile.address}
-                  onChange={(e) => setProfile({ ...profile, address: e.target.value })}
+                  onChange={(address, lat, lng) => setProfile({ ...profile, address, lat, lng })}
                   placeholder="Calle Gran Vía 1, Madrid"
                 />
-                <p className="text-xs text-gray-400 mt-1">Se usará para mostrarte en el mapa</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  {profile.lat ? '✓ Ubicación guardada — aparecerás en el mapa' : 'Selecciona una sugerencia para fijar tu ubicación en el mapa'}
+                </p>
               </div>
               <Input
                 label="Teléfono"
