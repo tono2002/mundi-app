@@ -1,0 +1,60 @@
+export const TEAM_FLAGS: Record<string, string> = {
+  Algeria: '🇩🇿',
+  Argentina: '🇦🇷',
+  Australia: '🇦🇺',
+  Austria: '🇦🇹',
+  Belgium: '🇧🇪',
+  'Bosnia & Herzegovina': '🇧🇦',
+  Brazil: '🇧🇷',
+  Canada: '🇨🇦',
+  'Cape Verde': '🇨🇻',
+  Colombia: '🇨🇴',
+  Croatia: '🇭🇷',
+  'Czech Republic': '🇨🇿',
+  'DR Congo': '🇨🇩',
+  Ecuador: '🇪🇨',
+  Egypt: '🇪🇬',
+  England: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+  France: '🇫🇷',
+  Germany: '🇩🇪',
+  Ghana: '🇬🇭',
+  Haiti: '🇭🇹',
+  Iran: '🇮🇷',
+  Iraq: '🇮🇶',
+  'Ivory Coast': '🇨🇮',
+  Japan: '🇯🇵',
+  Jordan: '🇯🇴',
+  Mexico: '🇲🇽',
+  Morocco: '🇲🇦',
+  Netherlands: '🇳🇱',
+  'New Zealand': '🇳🇿',
+  Norway: '🇳🇴',
+  Panama: '🇵🇦',
+  Paraguay: '🇵🇾',
+  Portugal: '🇵🇹',
+  Qatar: '🇶🇦',
+  'Saudi Arabia': '🇸🇦',
+  Scotland: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+  Senegal: '🇸🇳',
+  'South Africa': '🇿🇦',
+  'South Korea': '🇰🇷',
+  Spain: '🇪🇸',
+  Sweden: '🇸🇪',
+  Switzerland: '🇨🇭',
+  Tunisia: '🇹🇳',
+  Turkey: '🇹🇷',
+  USA: '🇺🇸',
+  Uruguay: '🇺🇾',
+  Uzbekistan: '🇺🇿',
+}
+
+export function getFlag(team: string): string {
+  return TEAM_FLAGS[team] ?? '⚽'
+}
+
+export function formatMatchDate(isoString: string): { date: string; time: string } {
+  const d = new Date(isoString)
+  const date = d.toLocaleDateString('es', { day: 'numeric', month: 'short' })
+  const time = d.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })
+  return { date, time }
+}

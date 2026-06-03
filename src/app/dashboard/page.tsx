@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import Link from 'next/link'
 import Badge from '@/components/ui/Badge'
+import BarMatchesSection from '@/components/dashboard/BarMatchesSection'
 
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient()
@@ -9,11 +10,16 @@ export default async function DashboardPage() {
 
   if (!user) redirect('/login')
 
-  const { data: bar } = await supabase
-    .from('bars')
-    .select('*')
-    .eq('owner_id', user.id)
-    .single()
+  const [{ data: bar }, { data: allMatches }, { data: barMatches }] = await Promise.all([
+    supabase.from('bars').select('*').eq('owner_id', user.id).single(),
+    supabase.from('matches').select('*').order('match_date', { ascending: true }),
+    supabase.from('bars').select('id').eq('owner_id', user.id).single().then(async ({ data: b }) => {
+      if (!b) return { data: [] }
+      return supabase.from('bar_matches').select('match_id').eq('bar_id', b.id)
+    }),
+  ])
+
+  const selectedMatchIds = (barMatches ?? []).map((bm: { match_id: string }) => bm.match_id)
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -39,7 +45,6 @@ export default async function DashboardPage() {
       </header>
 
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-8">
-        {/* Page title */}
         <div className="mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Panel de {bar?.name ?? 'tu bar'}
@@ -50,7 +55,7 @@ export default async function DashboardPage() {
         {/* Stats row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
           {[
-            { label: 'Partidos', value: '—', icon: '⚽' },
+            { label: 'Partidos', value: selectedMatchIds.length.toString(), icon: '⚽' },
             { label: 'Grupos', value: '—', icon: '🏆' },
             { label: 'Visitas', value: '—', icon: '👁️' },
             { label: 'Valoración', value: '—', icon: '⭐' },
@@ -70,7 +75,9 @@ export default async function DashboardPage() {
               <h2 className="font-semibold text-gray-900 flex items-center gap-2">
                 <span>🏪</span> Perfil del bar
               </h2>
-              <Badge variant="amber">Pendiente</Badge>
+              <Badge variant={bar?.description && bar?.address ? 'green' : 'amber'}>
+                {bar?.description && bar?.address ? 'Completo' : 'Pendiente'}
+              </Badge>
             </div>
             <div className="p-6 flex flex-col gap-4">
               <div>
@@ -90,29 +97,19 @@ export default async function DashboardPage() {
                 <p className="text-sm text-gray-600">{bar?.phone ?? '—'}</p>
               </div>
               <button className="mt-2 w-full py-2.5 border-2 border-dashed border-gray-200 rounded-xl text-sm text-gray-400 hover:border-green-400 hover:text-green-600 transition-colors">
-                + Completar perfil
+                + Editar perfil
               </button>
             </div>
           </div>
 
-          {/* Partidos */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-                <span>⚽</span> Partidos que emites
-              </h2>
-              <Badge variant="gray">0 activos</Badge>
-            </div>
-            <div className="p-6 flex flex-col gap-3">
-              <p className="text-sm text-gray-500 text-center py-8">
-                Todavía no has añadido partidos.<br />
-                Selecciona los que pondrás en tu bar.
-              </p>
-              <button className="w-full py-2.5 border-2 border-dashed border-gray-200 rounded-xl text-sm text-gray-400 hover:border-green-400 hover:text-green-600 transition-colors">
-                + Añadir partido
-              </button>
-            </div>
-          </div>
+          {/* Partidos — componente cliente con modal */}
+          {bar && (
+            <BarMatchesSection
+              barId={bar.id}
+              allMatches={allMatches ?? []}
+              initialSelectedIds={selectedMatchIds}
+            />
+          )}
 
           {/* Fotos */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden sm:col-span-2">
@@ -120,7 +117,7 @@ export default async function DashboardPage() {
               <h2 className="font-semibold text-gray-900 flex items-center gap-2">
                 <span>📸</span> Fotos del local
               </h2>
-              <Badge variant="gray">0 fotos</Badge>
+              <Badge variant="gray">{(bar?.photos ?? []).length} fotos</Badge>
             </div>
             <div className="p-6">
               <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
